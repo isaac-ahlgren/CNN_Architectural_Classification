@@ -1,3 +1,7 @@
+import os
+os.add_dll_directory("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.6/bin")
+
+from inception import Inception
 import tensorflow as tf
 import random
 
@@ -21,11 +25,22 @@ def get_architecture_dataset(directory, image_height, image_width, batch_size):
 
 def net():
     return tf.keras.models.Sequential([
-        tf.keras.layers.Conv2D(filters=32, kernel_size=7, activation='relu',
+        tf.keras.layers.Conv2D(filters=64, kernel_size=7, activation='relu',
                                padding='same'),
+        tf.keras.layers.BatchNormalization(),
         tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=2),
-        tf.keras.layers.Conv2D(filters=16, kernel_size=6,
-                               activation='relu'),
+        Inception(32, (16,16), (16,16), 32),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.MaxPool2D(pool_size=(3,3)),
+        tf.keras.layers.Dropout(0.5),
+        Inception(64, (32,32), (32,32), 64),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.MaxPool2D(pool_size=(3,3)),
+        tf.keras.layers.Dropout(0.5),
+        #Inception(64, (32,32), (32,32), 64),
+        #tf.keras.layers.BatchNormalization(),
+        #tf.keras.layers.MaxPool2D(pool_size=(3,3)),
+        tf.keras.layers.Conv2D(filters=16, kernel_size=7, activation='relu'),
         tf.keras.layers.GlobalAvgPool2D(),
         tf.keras.layers.Flatten(),
         tf.keras.layers.Dense(25)])
@@ -48,5 +63,7 @@ if __name__ == "__main__":
     model.fit(train,batch_size=batch_size,epochs=epochs)
 
     model.evaluate(test,batch_size=batch_size)
+
+    tf.keras.utils.plot_model(model, show_shapes=True)
 
 
