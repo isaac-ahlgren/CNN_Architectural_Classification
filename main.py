@@ -1,5 +1,5 @@
-import os
-os.add_dll_directory("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.6/bin")
+#import os
+#os.add_dll_directory("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.6/bin")
 
 from inception import Inception
 import tensorflow as tf
@@ -31,15 +31,15 @@ def net():
         tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=2),
         Inception(32, (16,16), (16,16), 32),
         tf.keras.layers.BatchNormalization(),
-        tf.keras.layers.MaxPool2D(pool_size=(3,3)),
+        tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=2),
+        tf.keras.layers.Dropout(0.5),
+        Inception(64, (32,32), (32,32), 64),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.MaxPool2D(pool_size=(3,3),strides=2),
         tf.keras.layers.Dropout(0.5),
         Inception(64, (32,32), (32,32), 64),
         tf.keras.layers.BatchNormalization(),
         tf.keras.layers.MaxPool2D(pool_size=(3,3)),
-        tf.keras.layers.Dropout(0.5),
-        #Inception(64, (32,32), (32,32), 64),
-        #tf.keras.layers.BatchNormalization(),
-        #tf.keras.layers.MaxPool2D(pool_size=(3,3)),
         tf.keras.layers.Conv2D(filters=16, kernel_size=7, activation='relu'),
         tf.keras.layers.GlobalAvgPool2D(),
         tf.keras.layers.Flatten(),
